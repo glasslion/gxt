@@ -53,8 +53,9 @@ func (s *ContextStdStream) Write(p []byte) (n int, err error) {
 
 func (s *ContextStdStream) flush() (err error) {
 	line := s.buf.String()
-	fmt.Println(len(line))
-	//_, err = s.fil.WriteString(s.formatLine(line))
+	if len(line) > 0 {
+		_, err = s.fil.WriteString(s.formatLine(line))
+	}
 	return nil
 }
 
