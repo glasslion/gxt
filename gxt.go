@@ -10,6 +10,10 @@ import (
 	"time"
 )
 
+// Because gxt is used to run other commands. Those commands themself
+// could have various kinds of parameters. To avoid conflict, gxt can not
+// use command parameters, instead it use environment variable.
+// Retrieve environment variable(interger type) by name
 func getIntConf(name string, default_val int) int {
 	str_val, found := os.LookupEnv(name)
 	if found {
@@ -29,12 +33,15 @@ const COLOR_RED = "\x1b[31m"
 const COLOR_GREEN = "\x1b[32m"
 const COLOR_YELLOW = "\x1b[33m"
 
+// Wrap os.Stdout/Stderr, prefix their output with the command name and highlight
+// the characters with different colors.
 type ContextStdStream struct {
 	fil *os.File
 	buf *bytes.Buffer
 	cmd string
 }
 
+// Factory function for ContextStdStream
 func NewContextStdStream(fil *os.File, cmd string) *ContextStdStream {
 	s := new(ContextStdStream)
 	s.fil = fil
@@ -42,6 +49,7 @@ func NewContextStdStream(fil *os.File, cmd string) *ContextStdStream {
 	s.cmd = cmd
 	return s
 }
+
 
 func (s *ContextStdStream) Write(p []byte) (n int, err error) {
 	if n, err = s.buf.Write(p); err != nil {
@@ -51,6 +59,7 @@ func (s *ContextStdStream) Write(p []byte) (n int, err error) {
 	return
 }
 
+// Flush all content to the file
 func (s *ContextStdStream) flush() (err error) {
 	line := s.buf.String()
 	if len(line) > 0 {
@@ -59,6 +68,8 @@ func (s *ContextStdStream) flush() (err error) {
 	return nil
 }
 
+
+// Flush buffered characters before the last line breaker(\n) to the file
 func (s *ContextStdStream) flushBufIfNeed() (err error) {
 	for {
 		line, err := s.buf.ReadString('\n')
@@ -76,7 +87,7 @@ func (s *ContextStdStream) flushBufIfNeed() (err error) {
 }
 
 func (s *ContextStdStream) formatLine(line string) string{
-	// indicator
+	// prefix
 	var color string
 	if s.fil.Name() == "/dev/stderr" {
 		color = COLOR_RED
