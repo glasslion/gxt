@@ -13,19 +13,18 @@ import (
 // Because gxt is used to run other commands. Those commands themself
 // could have various kinds of parameters. To avoid conflict, gxt can not
 // use command parameters, instead it use environment variable.
-// Retrieve environment variable(interger type) by name
-func getIntConf(name string, default_val int) int {
-	str_val, found := os.LookupEnv(name)
-	if found {
-		int_val, err := strconv.Atoi(str_val)
-		if err != nil {
+
+// Parse th string config value and return int, return the given default value
+// if string value if empty.
+func parseIntConf(strVal string, defaultVal int) (intVal int) {
+	intVal = defaultVal
+	if strVal != "" {
+		var err error
+		if intVal, err = strconv.Atoi(strVal); err != nil {
 			panic(err)
-		} else {
-			return int_val
 		}
-	} else {
-		return default_val
 	}
+	return
 }
 
 const COLOR_RESET = "\x1b[0m"
@@ -98,8 +97,8 @@ func (s *ContextStdStream) formatLine(line string) string{
 }
 
 func main() {
-	max_retries := getIntConf("GXT_MAX_RETRY", 999)
-	retry_wait := getIntConf("GXT_RETRY_WAIT", 3)
+	max_retries := parseIntConf(os.Getenv("GXT_MAX_RETRY"), 999)
+	retry_wait := parseIntConf(os.Getenv("GXT_MAX_RETRY"), 3)
 
 	cmdArgs := os.Args[1:]
 	outStream := NewContextStdStream(os.Stdout, cmdArgs[0])
