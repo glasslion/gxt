@@ -98,7 +98,7 @@ func (s *ContextStdStream) formatLine(line string) string{
 
 func main() {
 	max_retries := parseIntConf(os.Getenv("GXT_MAX_RETRY"), 999)
-	retry_wait := parseIntConf(os.Getenv("GXT_MAX_RETRY"), 3)
+	retry_wait := parseIntConf(os.Getenv("GXT_RETRY_WAIT"), 3)
 
 	cmdArgs := os.Args[1:]
 	outStream := NewContextStdStream(os.Stdout, cmdArgs[0])
